@@ -1,0 +1,75 @@
+.contenedor-editor {
+    display: flex;
+    height: 85vh;
+    width: 100%;
+    border: 1px solid #ccc;
+    font-family: monospace;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.numero-linea {
+    width: 40px;
+    background-color: #f4f4f4;
+    padding: 10px 5px;
+    text-align: right;
+    color: #666;
+    overflow: hidden;
+    font-family: monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.editor-codigo {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    resize: none;
+    outline: none;
+    font-family: monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    height: 100%;
+    overflow: auto;
+    white-space: nowrap;
+    word-wrap: normal;
+}
+
+.info-cursor {
+    padding: 10px;
+    font-size: 14px;
+    background-color: #b4aeae;
+    border-top: 1px solid #ccc;
+}
+
+.compilar-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.compilar-btn:hover {
+    background-color: #45a049;
+}
+
+.consola {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+    font-family: monospace;
+    font-size: 14px;
+    height: 150px;
+    overflow-y: auto;
+    border-top: 1px solid #ccc;
+}
+
+.salida-consola {
+    white-space: pre-wrap;
+}

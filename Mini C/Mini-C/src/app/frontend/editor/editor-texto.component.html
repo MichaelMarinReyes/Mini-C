@@ -1,0 +1,20 @@
+<div class="contenedor-editor">
+    <div class="numero-linea">
+        <div *ngFor="let line of lineas; let i = index">{{i + 1}}</div>
+    </div>
+    <textarea class="editor-codigo" [(ngModel)]="texto" (input)="onInput()" (scroll)="sincronizarScroll($event)"
+        (click)="actualizarPosicionCursor()" (keyup)="actualizarPosicionCursor()" #editor>
+    </textarea>
+</div>
+
+<div class="info-cursor">
+    Linea: {{lineaCursor}}, Columna: {{columnaCursor}}
+    <button class="compilar-btn" (click)="obtenerTexto()">Compilar</button>
+</div>
+
+<div class="consola">
+    <h4>Consola</h4>
+    <div class="salida-consola">
+        {{ salidaConsola }}
+    </div>
+</div>

@@ -1,0 +1,15 @@
+.contenedor-reportes {
+    padding: 20px;
+    background-color: #bbaaaa;
+    height: 100vh;
+    box-sizing: border-box;
+  }
+  
+  .titulo-reportes {
+    font-size: 32px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin-top: 50px;
+  }
+  
