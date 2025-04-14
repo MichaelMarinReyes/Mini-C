@@ -40,27 +40,29 @@
     errorSalida = "";
 }
 
+
 inicio "inicio"
   = _ lenguajes _ 
 
 lenguajes "lenguajes"
   = estructuraYAML
   / miniC
+  / comentario
 
 estructuraYAML "yml"
   = np:nombreProyecto _ main:main _ mods:modulos* _
 
 nombreProyecto "nombre proyecto"
-  = "nombre_proyecto" _ ":" _ "\"" nombre:variable "\"" 
+  = comentario* "nombre_proyecto" _ ":" _ "\"" nombre:variable "\"" comentario*
   
 main "main"
-  = "main" _ ":" _ "\"" _ "main.cmm" _ "\""
+  = comentario* "main" _ ":" _ "\"" _ "main.cmm" _ "\"" comentario*
   
 modulos "modulos"
-	= "modulo" numero ":" "\n" lista*
+	= comentario* "modulo" numero ":" "\n" lista* comentario*
     
 lista "lista"
-	= "archivo" numero _ ":" _ "\"" _ variable ".cmm" "\"" "\n"*
+	= comentario* "archivo" numero _ ":" _ "\"" _ variable ".cmm" "\"" "\n"* comentario*
 
 
 comentario "comentario"
