@@ -5,7 +5,7 @@ import { ReporteComponent } from './frontend/reportes/reportes.component';
 
 export const routes: Routes = [
     {path: '', redirectTo: 'inicio', pathMatch: 'full'},
-    {path: 'inicio', component: InicioComponent},
-    {path: 'editor', component: EditorTextoComponent },
-    {path: 'reportes', component: ReporteComponent}
+    {path: 'inicio', title: 'Mini-C', component: InicioComponent},
+    {path: 'editor', title: 'Editor', component: EditorTextoComponent },
+    {path: 'reportes', title: 'Reportes', component: ReporteComponent}
 ];

@@ -41,60 +41,39 @@
 }
 
 inicio "inicio"
-    = (lenguajes _?) {
-        return { salida: salida, error: errorSalida, symTable: memoria };
-    }
+  = _ lenguajes _ 
 
-lenguajes 
-    = estructuraYAML
-    / miniC
+lenguajes "lenguajes"
+  = estructuraYAML
+  / miniC
 
-estructuraYAML
-    = comentario* np:nombreProyecto comentario* _ main:main comentario* _ mods:moduloBloque* comentario* {
-        return {
-            nombre_proyecto: np,
-            main: main,
-            modulos: mods
-        };
-    }
+estructuraYAML "yml"
+  = np:nombreProyecto _ main:main _ mods:modulos* _
 
-nombreProyecto
-    = "nombre_proyecto" _ ":" _ "\"" nombre:variable "\"" _ {
-        memoria.set("nombre_proyecto", nombre);
-        return nombre;
-    }
-
-main
-    = "main" _ ":" _ "\"" archivo:variable ".cmm" "\"" {
-        const ruta = archivo + ".cmm";
-        memoria.set("main", ruta);
-        return ruta;
-    }
-
-moduloBloque
-    = nombre:variable _ ":" _ archivos:archivoModulo+ {
-        let mod = {};
-        archivos.forEach(a => mod[a.nombre] = a.archivo);
-        memoria.set(nombre, mod);
-        return { nombre, archivos: mod };
-    }
+nombreProyecto "nombre proyecto"
+  = "nombre_proyecto" _ ":" _ "\"" nombre:variable "\"" 
+  
+main "main"
+  = "main" _ ":" _ "\"" _ "main.cmm" _ "\""
+  
+modulos "modulos"
+	= "modulo" numero ":" "\n" lista*
+    
+lista "lista"
+	= "archivo" numero _ ":" _ "\"" _ variable ".cmm" "\"" "\n"*
 
 
-archivoModulo
-    = _ "-" nombre:variable _ ":" _ "\"" archivo:variable ".cmm" "\"" _ {
-        return { nombre, archivo: archivo + ".cmm" };
-    }
+comentario "comentario"
+  = _ "#" [^\n]* ("\n" / !.) { return null; }
 
+miniC "mini c"
+  = "hola"
+    
+variable "variable"
+  = [a-zA-Z_]* [a-zA-Z0-9]*
 
-comentario
-    = _ "#" [^\n]* ("\n" / !.) { return null; }
+numero "numero"
+	= [0-9]*
 
-variable
-    = l:[a-zA-Z_] r:[a-zA-Z0-9_]* { return l + r.join(""); }
-
-miniC = "mini"
-
-_ "WS"
-    = [ \t\r\n]*
-
-EOF = !.
+_ "whitespace"
+  = [ \t\n\r]*
