@@ -1,5 +1,8 @@
 <main class="main">
   <nav class="menu-bar">
+    <div>
+      <button class="boton-menu" routerLink="/inicio">Página Principal</button>
+    </div>
     <div class="menu-item" #menuArchivo (click)="toggleMenuArchivo()">
       <button class="boton-menu" routerLink="/archivo" routerLinkActive="activo">Archivo</button>
       <div class="submenu" *ngIf="menuArchivoVisible">

@@ -18,6 +18,9 @@ export class EditorTextoComponent implements AfterViewInit {
     lineaCursor = 1;
     columnaCursor = 1;
     salidaConsola: string = 'Prueba de consola';
+    error: string = "";
+    tablaSymbolos: Map<string, {value: AnalyserNode, type: String, location: any}> = new Map()
+    archivos: FileSystemFileHandle[] = [];
 
     @ViewChild('editor') editor!: ElementRef<HTMLTextAreaElement>;
 
@@ -46,7 +49,42 @@ export class EditorTextoComponent implements AfterViewInit {
         lineasDiv.scrollTop = target.scrollTop;
     }
 
-    obtenerTexto() {
+    obtenerTexto(): any {
         this.salidaConsola = this.texto;
+        try {
+            const resultado = parser.parse(this.texto);
+            this.salidaConsola = resultado.salida;
+            this.error = resultado.error;
+            this.tablaSymbolos = resultado.tablaSimbolos;
+            console.log('parseado sin errores')
+        } catch (error: any) {
+            this.salidaConsola = 'Error: ' + error.message;
+            console.log(error.message)
+        }
     }
+
+    async abrirCarpeta() {
+        try {
+          const dirHandle = await (window as any).showDirectoryPicker();
+          this.archivos = [];
+      
+          for await (const [_, handle] of dirHandle.entries()) {
+            if (handle.kind === 'file') {
+              this.archivos.push(handle);
+            }
+          }
+        } catch (error) {
+          console.error('Error al abrir carpeta:', error);
+        }
+      }
+      
+      async abrirArchivo(archivoHandle: FileSystemFileHandle) {
+        try {
+          const archivo = await archivoHandle.getFile();
+          const contenido = await archivo.text();
+          this.texto = contenido; // Mostrar el contenido en el editor
+        } catch (error) {
+          console.error('Error al leer archivo:', error);
+        }
+      }
 }

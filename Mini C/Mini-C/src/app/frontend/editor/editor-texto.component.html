@@ -1,4 +1,15 @@
 <div class="contenedor-editor">
+    <!-- Panel lateral -->
+    <div class="panel-lateral">
+        <button>➕ Nuevo CMM</button> <!--(click)="abrirCarpeta()"-->
+        <button>🗑️ Eliminar</button>
+        <ul class="lista-archivos">
+            <li *ngFor="let archivo of archivos" (click)="abrirArchivo(archivo)">
+                {{ archivo.name }}
+            </li>
+        </ul>
+    </div>
+
     <div class="numero-linea">
         <div *ngFor="let line of lineas; let i = index">{{i + 1}}</div>
     </div>

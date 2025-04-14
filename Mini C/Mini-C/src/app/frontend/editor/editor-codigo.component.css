@@ -6,23 +6,23 @@
     font-family: monospace;
     box-sizing: border-box;
     overflow: hidden;
-}
-
-.numero-linea {
+  }
+  
+  .numero-linea {
     width: 40px;
-    background-color: #f4f4f4;
+    background-color: #161616;
     padding: 10px 5px;
     text-align: right;
-    color: #666;
+    color: #ccc;
     overflow: hidden;
     font-family: monospace;
     font-size: 14px;
     line-height: 1.5;
     height: 100%;
     box-sizing: border-box;
-}
-
-.editor-codigo {
+  }
+  
+  .editor-codigo {
     flex: 1;
     padding: 10px;
     border: none;
@@ -35,30 +35,36 @@
     overflow: auto;
     white-space: nowrap;
     word-wrap: normal;
-}
-
-.info-cursor {
+    background-color: #333333;
+    color: #dcdcdc;
+  }
+  
+  .info-cursor {
     padding: 10px;
     font-size: 14px;
-    background-color: #b4aeae;
-    border-top: 1px solid #ccc;
-}
-
-.compilar-btn {
-    background-color: #4CAF50;
+    background-color: #2e2e2e;
+    color: #eee;
+    border-top: 1px solid #444;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .compilar-btn {
+    background-color: #0fa64f;
     color: white;
     padding: 8px 16px;
     border: none;
     cursor: pointer;
     border-radius: 4px;
     transition: background-color 0.3s;
-}
-
-.compilar-btn:hover {
-    background-color: #45a049;
-}
-
-.consola {
+  }
+  
+  .compilar-btn:hover {
+    background-color: #0c8b41;
+  }
+  
+  .consola {
     margin-top: 10px;
     padding: 10px;
     background-color: #1e1e1e;
@@ -67,9 +73,51 @@
     font-size: 14px;
     height: 150px;
     overflow-y: auto;
-    border-top: 1px solid #ccc;
-}
-
-.salida-consola {
+    border-top: 1px solid #444;
+  }
+  
+  .salida-consola {
     white-space: pre-wrap;
-}
+  }
+  
+  .panel-lateral {
+    width: 200px;
+    background: #2e2e2e;
+    color: white;
+    padding: 1rem;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .panel-lateral button {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    background-color: #0fa64f;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+  }
+  
+  .panel-lateral button:hover {
+    background-color: #0c8b41;
+  }
+  
+  .lista-archivos {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .lista-archivos li {
+    cursor: pointer;
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+  }
+  
+  .lista-archivos li:hover {
+    background-color: #3a3a3a;
+  }
+  
