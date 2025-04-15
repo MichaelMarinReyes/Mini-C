@@ -69,14 +69,16 @@ comentario "comentario"
   = _ "#" [^\n]* ("\n" / !.) { return null; }
 
 //Parser para Mini C
-miniC "bloque Mini C"
-  = metodoMain
+miniC "Bloque Mini C"
+  = cuerpoMiniC*
 
 metodoMain "main"
-  = "void" _ "main" _ "(" _ ")" _ "{" _ sentencia _ "}"
+  = "void" _ "main" _ "(" _ ")" _ "{" _ cuerpo:sentencia* _ "}" _ {
+      return { tipo: "main", cuerpo };
+  }
 
 sentencia
-  = declaracionVariables*
+  = declaracionVariables
   / asignacionVariable
 
 declaracionVariables "declaración de variables"
@@ -85,7 +87,7 @@ declaracionVariables "declaración de variables"
   }
 
 asignacionVariable "asignación"
-  = nombre:variable _ "=" _ valor:expresion {
+  = nombre:variable _ "=" _ valor:expresion _ ";" {
       return { tipo: "asignacion", nombre, valor };
   }
 
@@ -95,7 +97,6 @@ tipoVariable "tipo"
   / "string"
   / "char"
   / "bool"
-  / "struct"
 
 expresion "expresión"
   = sumaResta
@@ -134,7 +135,30 @@ primario
   / cadena
   / caracter
   / boolean
+  
+cuerpoMiniC
+	= structs
+    / impresionConsola
+    / funciones
 
+structs "structs"
+	= "struct" _ variable _ "{" ( _ tipoVariable _ variable _ ";" _ )* "}" _
+    
+impresionConsola "print"
+	= "print" _ "(" _ "\"" _ variable* _ ("$"_ "{"_ variable _ "}" _ )* "\"" _ ")" _ ";"
+    / "print" _ "(" _ variable _ ")" _ ";"
+    / "print" _ "(" (_ variable* _ "{" _ variable _ "}" _)* ";"
+    
+funciones "función"
+	= tipoVariable _ variable _ "(" _ (parametros)* _ ")" _ "{" _ declaracionStruct* _ "return" _ variable _ ";" _ "}"
+    / "void" _ variable _ "(" _ (parametros)* _ ")" _ "{" _ declaracionStruct* _ "}"
+    
+    
+declaracionStruct "variables de struct"
+	= tipoVariable _ variable _ ";"
+
+parametros "parametros"
+	= tipoVariable _ variable _ ("," _ tipoVariable _ variable _ )*
 
 numero "número"
   = n:([0-9]+ ("." [0-9]+)?) {
