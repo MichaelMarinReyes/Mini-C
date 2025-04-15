@@ -57,6 +57,7 @@ export class EditorTextoComponent implements AfterViewInit {
             this.error = resultado.error;
             this.tablaSymbolos = resultado.tablaSimbolos;
             console.log('parseado sin errores')
+            this.salidaConsola = "parseo sin errores"
         } catch (error: any) {
             this.salidaConsola = 'Error: ' + error.message;
             console.log(error.message)
