@@ -4,10 +4,25 @@
         <button>➕ Nuevo CMM</button> <!--(click)="abrirCarpeta()"-->
         <button>🗑️ Eliminar</button>
         <ul class="lista-archivos">
-            <li *ngFor="let archivo of archivos" (click)="abrirArchivo(archivo)">
-                {{ archivo.name }}
-            </li>
+            <ng-container *ngFor="let archivo of estructuraArchivos">
+                <ng-template [ngTemplateOutlet]="mostrarNodo"
+                    [ngTemplateOutletContext]="{ nodo: archivo, nivel: 0 }"></ng-template>
+            </ng-container>
         </ul>
+        
+        <ng-template #mostrarNodo let-nodo let-nivel="nivel">
+            <li [class.cmm]="nodo.archivo" [style.paddingLeft.px]="nivel * 15"
+                (click)="nodo.archivo && abrirArchivo(nodo.archivo)">
+                {{ nodo.nombre }}
+            </li>
+        
+            <ul *ngIf="nodo.hijos && nodo.hijos.length > 0" class="lista-archivos">
+                <ng-container *ngFor="let hijo of nodo.hijos">
+                    <ng-template [ngTemplateOutlet]="mostrarNodo"
+                        [ngTemplateOutletContext]="{ nodo: hijo, nivel: nivel + 1 }"></ng-template>
+                </ng-container>
+            </ul>
+        </ng-template>
     </div>
 
     <div class="numero-linea">

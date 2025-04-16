@@ -51,19 +51,24 @@ lenguajes "lenguajes"
 
 //Parser para YAML
 estructuraYAML "yml"
-  = np:nombreProyecto _ main:main _ mods:modulos* _
+  = np:nombreProyecto _ main:main _ mods:modulos* _ 
+  { return {nombre: np, main: main, modulos: mods}; }
 
 nombreProyecto "nombre proyecto"
   = comentario* "nombre_proyecto" _ ":" _ "\"" nombre:variable "\"" comentario*
+  { return nombre; }
   
 main "main"
-  = comentario* "main" _ ":" _ "\"" _ variable ".cmm" _ "\"" comentario*
+  = comentario* "main" _ ":" _ "\"" _ archivo:variable ".cmm" _ "\"" comentario*
+  { return archivo + ".cmm"; }
   
 modulos "modulos"
-	= comentario* "modulo" numero ":" "\n" lista* comentario*
+	= comentario* "modulo" numero ":" "\n" archivos:lista* comentario* 
+  { return archivos.flat(); }
     
 lista "lista"
-	= comentario* "archivo" numero _ ":" _ "\"" _ variable ".cmm" "\"" "\n"* comentario*
+	= comentario* "archivo" numero _ ":" _ "\"" _ archivo:variable ".cmm" "\"" "\n"* comentario*
+  { return [archivo - ".cmm"]; }
 
 comentario "comentario"
   = _ "#" [^\n]* ("\n" / !.) { return null; }

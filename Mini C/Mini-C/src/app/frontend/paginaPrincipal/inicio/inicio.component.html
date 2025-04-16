@@ -1,9 +1,9 @@
 <div class="inicio">
-    <h2>Bienvenido a Mini-C</h2>
-    <p>Selecciona una opción para comenzar:</p>
-    <div class="opciones">
-      <button routerLink="/nuevo">Nuevo archivo</button>
-      <button routerLink="/abrir">Abrir archivo</button>
-    </div>
+  <h2>Bienvenido a Mini-C</h2>
+  <p>Selecciona una opción para comenzar:</p>
+  <div class="opciones">
+    <button routerLink="/nuevo">Nuevo archivo</button>
+    <button (click)="abrirArchivo()">Abrir proyecto</button>
+    <input type="file" #fileInput accept=".yml" style="display: none;" (change)="leerArchivoYML($event)" />
   </div>
-  
+</div>

@@ -121,3 +121,22 @@
     background-color: #3a3a3a;
   }
   
+  .lista-archivos li {
+    cursor: pointer;
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+  
+  .lista-archivos li:hover {
+    background-color: #3a3a3a;
+  }
+  
+  .lista-archivos li::before {
+    content: '📁 ';
+  }
+  
+  .lista-archivos li.cmm::before {
+    content: '📄 ';
+  }
+  
