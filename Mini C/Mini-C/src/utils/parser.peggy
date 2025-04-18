@@ -46,8 +46,6 @@ inicio "inicio"
 lenguajes "lenguajes"
   = estructuraYAML
   / miniC
-  / comentario
-  / declaracionVariables
 
 //Parser para YAML
 estructuraYAML "yml"
@@ -75,7 +73,7 @@ comentario "comentario"
 
 //Parser para Mini C
 miniC "Bloque Mini C"
-  = cuerpoMiniC*
+  = metodoMain _ cuerpoMiniC*
 
 metodoMain "main"
   = "void" _ "main" _ "(" _ ")" _ "{" _ cuerpo:sentencia* _ "}" _ {
@@ -83,8 +81,8 @@ metodoMain "main"
   }
 
 sentencia
-  = declaracionVariables
-  / asignacionVariable
+  = declaracionVariables _
+  / asignacionVariable _
 
 declaracionVariables "declaración de variables"
   = tipo:tipoVariable _ nombre:variable _ "=" _ valor:expresion _ ";" {
@@ -142,17 +140,16 @@ primario
   / boolean
   
 cuerpoMiniC
-	= structs
-    / impresionConsola
-    / funciones
+	= structs _
+    / impresionConsola _
+    / funciones _
 
 structs "structs"
 	= "struct" _ variable _ "{" ( _ tipoVariable _ variable _ ";" _ )* "}" _
     
 impresionConsola "print"
-	= "print" _ "(" _ "\"" _ variable* _ ("$"_ "{"_ variable _ "}" _ )* "\"" _ ")" _ ";"
-    / "print" _ "(" _ variable _ ")" _ ";"
-    / "print" _ "(" (_ variable* _ "{" _ variable _ "}" _)* ";"
+	= "print" _ "(" _ "\"" _ variable* _ ("$"_ "{"_ variable _ "}" _ (variable _)*)* "\"" _ ")" _ ";"
+    / "print" _ "(" _ (variable _)* _ ")" _ ";"
     
 funciones "función"
 	= tipoVariable _ variable _ "(" _ (parametros)* _ ")" _ "{" _ declaracionStruct* _ "return" _ variable _ ";" _ "}"
