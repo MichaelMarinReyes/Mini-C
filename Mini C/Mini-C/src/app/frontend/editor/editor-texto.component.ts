@@ -1,6 +1,8 @@
 import { Component, ViewChild, ElementRef, AfterViewInit, OnInit } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { CommonModule } from "@angular/common";
+import { Router } from "@angular/router";
+import { ErrorService } from "../../backend/parser.service.js";
 
 import * as parser from '../../../utils/parser.js';
 
@@ -11,6 +13,7 @@ import * as parser from '../../../utils/parser.js';
   templateUrl: './editor-texto.component.html',
   styleUrls: ['./editor-codigo.component.css']
 })
+
 export class EditorTextoComponent implements AfterViewInit, OnInit {
   texto: string = '';
   lineas: number[] = [1];
@@ -20,6 +23,8 @@ export class EditorTextoComponent implements AfterViewInit, OnInit {
   error: string = "";
   tablaSymbolos: Map<string, { value: AnalyserNode, type: String, location: any }> = new Map();
   estructuraArchivos: ArchivoNodo[] = [];
+
+  constructor(private errorService: ErrorService, private router: Router) {}
 
   @ViewChild('editor') editor!: ElementRef<HTMLTextAreaElement>;
 
@@ -59,20 +64,30 @@ export class EditorTextoComponent implements AfterViewInit, OnInit {
     }
   }
 
-  obtenerTexto(): any {
+  obtenerTexto(): void {
     this.salidaConsola = this.texto;
     try {
       const resultado = parser.parse(this.texto);
+  
       this.salidaConsola = resultado.salida;
       this.error = resultado.error;
       this.tablaSymbolos = resultado.tablaSimbolos;
-      console.log('parseado sin errores');
+  
+      if (Array.isArray(resultado.error)) {
+        this.errorService.setErrores(resultado.error);
+      } else {
+        this.errorService.setErrores([{ tipo: 'Error', descripcion: resultado.error }]);
+      }
+  
       this.salidaConsola = "parseo sin errores";
+      //this.router.navigate(['/reportes']);
     } catch (error: any) {
       this.salidaConsola = 'Error: ' + error.message;
-      console.log(error.message);
+      this.errorService.setErrores([{ tipo: 'Excepción', descripcion: error.message }]);
+      this.router.navigate(['/reportes']);
     }
   }
+  
 
   async abrirCarpeta() {
     try {

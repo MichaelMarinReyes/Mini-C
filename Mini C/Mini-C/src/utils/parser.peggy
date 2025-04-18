@@ -2,6 +2,7 @@
     let memoria = new Map();
     let salida = "";
     let errorSalida = "";
+    let errores = [];
 
     function setVariable(id, valor, tipo, linea, columna) {
         memoria.set(id, {value: valor, type: tipo, location: {line: linea, col: columna}})
@@ -23,15 +24,17 @@
         salida += linea;
     }
 
-    function añadirError(errorMensaje, location) {
-        if (errorSalida !== "") {
-            errorSalida += "\n";
-        }
-        let inicioColumna = location.start.column;
-        let finColumna = location.end.column;
-        let line = location.start.line;
-        errorSalida += `Error en la linea ${line}:${inicioColumna}:${finColumna}. ${errorMensaje}`;
-    }
+    function añadirError(mensaje, location, tipo = "sintáctico") {
+      errores.push({
+          tipo,
+          linea: location.start.line,
+          columna: location.start.column,
+          descripcion: mensaje
+    });
+
+    module.exports = {parse, getErrores(): () => errores};
+}
+
 }}
 
 {
@@ -76,12 +79,15 @@ miniC "Bloque Mini C"
   = metodoMain _ cuerpoMiniC*
 
 metodoMain "main"
-  = "void" _ "main" _ "(" _ ")" _ "{" _ cuerpo:sentencia* _"}" _ 
+  = "void" _ "main" _ "(" _ ")" _ "{" _ cuerpo:sentencia* _ "}" _
 
 sentencia
   = declaracionVariables _
   / asignacionVariable _
   / condicional _
+  / impresionConsola _
+  / funciones _
+  / structs _
 
 declaracionVariables "declaración de variables"
   = tipo:tipoVariable _ nombre:variable _ "=" _ valor:expresion _ ";" {
@@ -91,9 +97,9 @@ declaracionVariables "declaración de variables"
 asignacionVariable "asignación"
   = nombre:variable _ "=" _ valor:expresion _ ";"
   / nombre:variable _ "=" _ valor:funcion
-  
+
 funcion
-	= variable _ "(" _ ((variable/numero) _ ",")* _ ")" _ ";" //Arreglar los parámetros que se mandan
+  = variable _ "(" _ ((variable / numero) _ ("," _ (variable / numero))*)? _ ")" _ ";"
 
 tipoVariable "tipo"
   = "int"
@@ -139,43 +145,71 @@ primario
   / cadena
   / caracter
   / boolean
-  
-cuerpoMiniC
-	= structs _
-    / impresionConsola _
-    / funciones _
 
+// -> Contenido después del método main
+cuerpoMiniC
+  = structs _
+  / impresionConsola _
+  / funciones _
+
+//-> Struct
 structs "structs"
-	= "struct" _ variable _ "{" ( _ tipoVariable _ variable _ ";" _ )* "}" _
-    
+  = "struct" _ variable _ "{" ( _ tipoVariable _ variable _ ";" _ )* "}" _
+
 impresionConsola "print"
-	= "print" _ "(" _ "\"" _ variable* _ ("$"_ "{"_ variable _ "}" _ (variable _)*)* "\"" _ ")" _ ";"
-    / "print" _ "(" _ (variable _)* _ ")" _ ";"
-    
+  = "print" _ "(" _ "\"" _ variable* _ ("$" _ "{" _ variable _ "}" _ (variable _)*)* "\"" _ ")" _ ";" 
+  / "print" _ "(" _ (variable _)* _ ")" _ ";"
+
+//-> Funciones
 funciones "función"
-	= tipoVariable _ variable _ "(" _ (parametros)* _ ")" _ "{" _ declaracionStruct* _ impresionConsola* _ "return" _ variable _ ";" _ "}"
-    / "void" _ variable _ "(" _ (parametros)* _ ")" _ "{" _ declaracionStruct* _ impresionConsola* _ "}"
-    
-    
+  = tipoVariable _ variable _ "(" _ (parametros)* _ ")" _ "{" _ contenidoFuncion* _ "return" _ variable _ ";" _ "}"
+  / "void" _ variable _ "(" _ (parametros)* _ ")" _ "{" _ contenidoFuncion* _"}"
+
+contenidoFuncion
+	= declaracionStruct _
+    / impresionConsola _
+    / asignacionVariable _
+    / declaracionVariables _
+    / cicloFor _
+
 declaracionStruct "variables de struct"
-	= tipoVariable _ variable _ ";"
+  = tipoVariable _ variable _ ";"
 
 parametros "parametros"
-	= tipoVariable _ variable _"*"? _ ("," _ tipoVariable _ variable _ "*"? _ )*
+  = tipoVariable _ variable _ "*"?
+  (_ "," _ tipoVariable _ variable _ "*"?)?
 
+// Condicional if-else-if
 condicional "condicional if"
-	= "if" _ "(" _ condicion _ ")" _ "{" _ bloqueCondicional _ "}" _ ("else" _ "{" _ bloqueCondicional _ "}")?
-    / "if" _ "(" _ condicion _ ")" _ "{" _ bloqueCondicional _ "}" _ ("else" _ "if" _ "(" _ condicion _ ")" _ "{" _ bloqueCondicional _ "}")*
-    
+  = "if" _ "(" _ condicion _ ")" _ "{" _ bloqueCondicional* _ "}" _ elseParte?
+
+elseParte
+  = _ "else" _ ( condicional / "{" _ bloqueCondicional* _ "}" )
+
 condicion "condicion"
-	= expresion _ (">" / "<" / ">=" / "<=") _ expresion
-    / expresion _ ("||" / "&&") _ expresion
-    / ("!")_ expresion
+  = expresion _ (">" / "<" / ">=" / "<=") _ expresion
+  / expresion _ ("||" / "&&") _ expresion
+  / "!" _ expresion
 
 bloqueCondicional
-	= impresionConsola*
-    / asignacionVariable*
-    / declaracionVariables*
+  = declaracionVariables _
+  / asignacionVariable _
+  / condicional _
+  / impresionConsola _
+
+
+// Ciclo FOR
+cicloFor "Ciclo For"
+  = "for" _ "(" _ "int" _ variable:"i" _ "=" _ inicio:numero _ ";" _ condicion:condicion _ ";" _ cambio:("i++" / "i--") _ ")" _ "{" _ cuerpo:bloqueCondicional* _ "}" {
+      return {
+        tipo: "cicloFor",
+        variable,
+        inicio,
+        condicion,
+        cambio,
+        cuerpo
+      };
+}
 
 numero "número"
   = n:([0-9]+ ("." [0-9]+)?) {
@@ -193,7 +227,7 @@ caracter "char"
   }
 
 boolean "booleano"
-  = "true"  { return true; }
+  = "true" { return true; }
   / "false" { return false; }
 
 variable "variable"

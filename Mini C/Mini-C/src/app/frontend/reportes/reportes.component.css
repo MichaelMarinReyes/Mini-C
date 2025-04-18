@@ -1,15 +1,41 @@
-.contenedor-reportes {
-    padding: 20px;
-    background-color: #bbaaaa;
-    height: 100vh;
-    box-sizing: border-box;
+.tabla-errores {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin-top: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tabla-errores thead {
+  background-color: #007acc;
+  color: white;
+  text-align: left;
+}
+
+.tabla-errores th,
+.tabla-errores td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #ddd;
+}
+
+.tabla-errores tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.tabla-errores tbody tr:hover {
+  background-color: #e6f7ff;
+  transition: background-color 0.3s ease;
+}
+
+@media screen and (max-width: 768px) {
+  .tabla-errores {
+    font-size: 14px;
   }
-  
-  .titulo-reportes {
-    font-size: 32px;
-    font-weight: bold;
-    color: #333;
-    text-align: center;
-    margin-top: 50px;
+
+  .tabla-errores th,
+  .tabla-errores td {
+    padding: 10px;
   }
-  
+}

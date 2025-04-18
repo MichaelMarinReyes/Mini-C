@@ -1,3 +1,19 @@
-<div class="contenedor-reportes">
-    <h1 class="titulo-reportes">Reportes</h1>
-</div>
+<h2>Errores detectados</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Tipo</th>
+      <th>Línea</th>
+      <th>Columna</th>
+      <th>Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let error of errores">
+      <td>{{ error.tipo }}</td>
+      <td>{{ error.linea }}</td>
+      <td>{{ error.columna }}</td>
+      <td>{{ error.descripcion }}</td>
+    </tr>
+  </tbody>
+</table>
