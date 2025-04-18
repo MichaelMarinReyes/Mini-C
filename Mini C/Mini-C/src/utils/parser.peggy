@@ -76,13 +76,12 @@ miniC "Bloque Mini C"
   = metodoMain _ cuerpoMiniC*
 
 metodoMain "main"
-  = "void" _ "main" _ "(" _ ")" _ "{" _ cuerpo:sentencia* _ "}" _ {
-      return { tipo: "main", cuerpo };
-  }
+  = "void" _ "main" _ "(" _ ")" _ "{" _ cuerpo:sentencia* _"}" _ 
 
 sentencia
   = declaracionVariables _
   / asignacionVariable _
+  / condicional _
 
 declaracionVariables "declaración de variables"
   = tipo:tipoVariable _ nombre:variable _ "=" _ valor:expresion _ ";" {
@@ -90,9 +89,11 @@ declaracionVariables "declaración de variables"
   }
 
 asignacionVariable "asignación"
-  = nombre:variable _ "=" _ valor:expresion _ ";" {
-      return { tipo: "asignacion", nombre, valor };
-  }
+  = nombre:variable _ "=" _ valor:expresion _ ";"
+  / nombre:variable _ "=" _ valor:funcion
+  
+funcion
+	= variable _ "(" _ ((variable/numero) _ ",")* _ ")" _ ";" //Arreglar los parámetros que se mandan
 
 tipoVariable "tipo"
   = "int"
@@ -152,15 +153,29 @@ impresionConsola "print"
     / "print" _ "(" _ (variable _)* _ ")" _ ";"
     
 funciones "función"
-	= tipoVariable _ variable _ "(" _ (parametros)* _ ")" _ "{" _ declaracionStruct* _ "return" _ variable _ ";" _ "}"
-    / "void" _ variable _ "(" _ (parametros)* _ ")" _ "{" _ declaracionStruct* _ "}"
+	= tipoVariable _ variable _ "(" _ (parametros)* _ ")" _ "{" _ declaracionStruct* _ impresionConsola* _ "return" _ variable _ ";" _ "}"
+    / "void" _ variable _ "(" _ (parametros)* _ ")" _ "{" _ declaracionStruct* _ impresionConsola* _ "}"
     
     
 declaracionStruct "variables de struct"
 	= tipoVariable _ variable _ ";"
 
 parametros "parametros"
-	= tipoVariable _ variable _ ("," _ tipoVariable _ variable _ )*
+	= tipoVariable _ variable _"*"? _ ("," _ tipoVariable _ variable _ "*"? _ )*
+
+condicional "condicional if"
+	= "if" _ "(" _ condicion _ ")" _ "{" _ bloqueCondicional _ "}" _ ("else" _ "{" _ bloqueCondicional _ "}")?
+    / "if" _ "(" _ condicion _ ")" _ "{" _ bloqueCondicional _ "}" _ ("else" _ "if" _ "(" _ condicion _ ")" _ "{" _ bloqueCondicional _ "}")*
+    
+condicion "condicion"
+	= expresion _ (">" / "<" / ">=" / "<=") _ expresion
+    / expresion _ ("||" / "&&") _ expresion
+    / ("!")_ expresion
+
+bloqueCondicional
+	= impresionConsola*
+    / asignacionVariable*
+    / declaracionVariables*
 
 numero "número"
   = n:([0-9]+ ("." [0-9]+)?) {
