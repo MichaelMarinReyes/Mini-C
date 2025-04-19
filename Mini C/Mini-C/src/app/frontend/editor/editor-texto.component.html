@@ -29,7 +29,7 @@
         <div *ngFor="let line of lineas; let i = index">{{i + 1}}</div>
     </div>
     <textarea class="editor-codigo" [(ngModel)]="texto" (input)="onInput()" (scroll)="sincronizarScroll($event)"
-        (click)="actualizarPosicionCursor()" (keyup)="actualizarPosicionCursor()" #editor>
+        (click)="actualizarPosicionCursor()" (keyup)="actualizarPosicionCursor()" (keydown)="manejarTabulador($event)" #editor>
     </textarea>
 </div>
 

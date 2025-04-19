@@ -80,11 +80,12 @@ export class EditorTextoComponent implements AfterViewInit, OnInit {
       }
   
       this.salidaConsola = "parseo sin errores";
+      this.salidaConsola = resultado.salida;
       //this.router.navigate(['/reportes']);
     } catch (error: any) {
       this.salidaConsola = 'Error: ' + error.message;
       this.errorService.setErrores([{ tipo: 'Excepción', descripcion: error.message }]);
-      this.router.navigate(['/reportes']);
+      //this.router.navigate(['/reportes']);
     }
   }
   
@@ -122,6 +123,31 @@ export class EditorTextoComponent implements AfterViewInit, OnInit {
       this.actualizarLineas();
     } catch (error) {
       console.error('Error al leer archivo:', error);
+    }
+  }
+
+  manejarTabulador(event: KeyboardEvent) {
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      console.log("Tab presionado");
+  
+      const textArea = this.editor.nativeElement;
+      const start = textArea.selectionStart;
+      const end = textArea.selectionEnd;
+  
+      const tab = '    ';
+      const before = this.texto.substring(0, start);
+      const after = this.texto.substring(end);
+  
+      this.texto = before + tab + after;
+  
+      textArea.value = this.texto;
+  
+      const newPosition = start + tab.length;
+      textArea.setSelectionRange(newPosition, newPosition);
+  
+      this.actualizarLineas();
+      this.actualizarPosicionCursor();
     }
   }
 }
