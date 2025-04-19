@@ -69,7 +69,7 @@ export class EditorTextoComponent implements AfterViewInit, OnInit {
     try {
       const resultado = parser.parse(this.texto);
   
-      this.salidaConsola = resultado.salida;
+      this.salidaConsola = "parseo sin errores";
       this.error = resultado.error;
       this.tablaSymbolos = resultado.tablaSimbolos;
   
@@ -79,16 +79,22 @@ export class EditorTextoComponent implements AfterViewInit, OnInit {
         this.errorService.setErrores([{ tipo: 'Error', descripcion: resultado.error }]);
       }
   
-      this.salidaConsola = "parseo sin errores";
       this.salidaConsola = resultado.salida;
-      //this.router.navigate(['/reportes']);
+  
     } catch (error: any) {
       this.salidaConsola = 'Error: ' + error.message;
-      this.errorService.setErrores([{ tipo: 'Excepción', descripcion: error.message }]);
-      //this.router.navigate(['/reportes']);
-    }
-  }
   
+      this.errorService.setErrores([
+        {
+          tipo: 'Excepción',
+          descripcion: error.message,
+          linea: error.line || 0,
+          columna: error.column || 0,
+          lexema: error.lexema || '',
+        }
+      ]);
+    }
+  }  
 
   async abrirCarpeta() {
     try {
@@ -129,7 +135,6 @@ export class EditorTextoComponent implements AfterViewInit, OnInit {
   manejarTabulador(event: KeyboardEvent) {
     if (event.key === 'Tab') {
       event.preventDefault();
-      console.log("Tab presionado");
   
       const textArea = this.editor.nativeElement;
       const start = textArea.selectionStart;

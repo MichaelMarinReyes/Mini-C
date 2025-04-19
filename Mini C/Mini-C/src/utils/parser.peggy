@@ -14,7 +14,7 @@
           añadirError("Variable " + id + " no está definida", location())
           return null
       }
-      return registro.value
+      return registro.value;
   }
   
   function salidaTexto(linea) {
@@ -24,7 +24,7 @@
       salida += linea;
   }
   
-    function addError(errorMessage, location) {
+    function añadirError(errorMessage, location) {
         if (errorSalida !== "") {
             errorSalida += "\n";
         }
@@ -101,6 +101,7 @@ asignacionVariable "asignación"
       if (tipo === null) {
         añadirError("Variable " + variable + " no está definida", location());
       }
+
       setVariable(variable, valor, tipo, location().start.line, location().start.column);
       return { tipo: "asignación", nombre: variable, valor, ubicacion: location() };
     }
@@ -147,9 +148,16 @@ sumaResta
 
 multiplicacionDivision
   = izq:potencia _ op:("*" / "/") _ der:multiplicacionDivision {
-    return (op == "*" ? izq * der : izq / der);
-  }
-  / potencia multiplicacionImplicita*
+      return (op == "*" ? izq * der : izq / der);
+    }
+  /base:potencia lista:multiplicacionImplicita* {
+      let resultado = base;
+      for (let i = 0; i < lista.length; i++) {
+        resultado *= lista[i];
+      }
+      return resultado;
+    }
+
 
 multiplicacionImplicita
   = _ der:potencia { return der; }
@@ -166,7 +174,7 @@ unario
   {
     return { tipo: "unario", op: "-", valor };
   }
-  / primario
+  / pri:primario { return pri; }
 
 primario
   = "(" _ expr:sumaResta _ ")"  { return expr; }
@@ -193,6 +201,13 @@ impresionConsola "print"
       salidaTexto(texto);
       return { tipo: "impresion", valor: texto, ubicacion: location() };
     }
+  / "print" _ "(" _ variable:variable _ ")" _ ";"
+    {
+      const variableExiste = getVariable(variable);
+      if (variableExiste !== null) {
+        salidaTexto(variableExiste);
+      }
+    }
 
 interpolacion
   = "\"" contenido:contenidoInterpolado "\"" {
@@ -210,7 +225,7 @@ contenidoInterpolado
           if (val !== null) {
             resultado += val;
           } else {
-            addError("Variable " + p.nombre + " no definida en interpolación", location());
+            añadirError("Variable " + p.nombre + " no definida en interpolación", location());
             resultado += "${" + p.nombre + "}";
           }
         }
@@ -257,7 +272,7 @@ condicional "condicional if"
     let resultadoCond = cond;
 
     if (typeof resultadoCond !== "boolean") {
-      addError("La condición del if no es booleana", location());
+      añadirError("La condición del if no es booleana", location());
     } else if (resultadoCond === true) {
       bloque.forEach(instr => {
         // podrías ejecutar la instrucción aquí si tienes un motor
@@ -341,9 +356,9 @@ cicloFor "Ciclo For"
   }
 
 numero "número"
-  = n:([0-9]+ ("." [0-9]+)?) 
-  {
-    return parseFloat(n.join(""));
+  = entero:[0-9]+ decimal:("." [0-9]+)? {
+      const numeroComoTexto = entero.join("") + (decimal ? decimal[0] + decimal[1].join("") : "");
+      return parseFloat(numeroComoTexto);
   }
 
 cadena "string"
