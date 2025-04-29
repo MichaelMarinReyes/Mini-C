@@ -21,7 +21,7 @@ export class EditorTextoComponent implements AfterViewInit, OnInit {
   columnaCursor = 1;
   salidaConsola: string = 'Prueba de consola';
   error: string = "";
-  tablaSymbolos: Map<string, { value: AnalyserNode, type: String, location: any }> = new Map();
+  tablaSymbolos: Map<string, { value: any, type: String, location: any}> = new Map();
   estructuraArchivos: ArchivoNodo[] = [];
 
   constructor(private errorService: ErrorService, private router: Router) {}
@@ -72,7 +72,8 @@ export class EditorTextoComponent implements AfterViewInit, OnInit {
       this.salidaConsola = "parseo sin errores";
       this.error = resultado.error;
       this.tablaSymbolos = resultado.tablaSimbolos;
-  
+
+      console.log(this.tablaSymbolos);
       if (Array.isArray(resultado.error)) {
         this.errorService.setErrores(resultado.error);
       } else {

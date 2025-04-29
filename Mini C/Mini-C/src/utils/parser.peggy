@@ -21,18 +21,28 @@
       if (salida !== "") {
           salida += "\n";
       }
-      salida += linea;
+      salida += String(linea);
   }
   
-    function añadirError(errorMessage, location) {
-        if (errorSalida !== "") {
-            errorSalida += "\n";
-        }
-        let startCol = location.start.column
-        let endCol = location.end.column
-        let line = location.start.line
-        errorSalida += "Error en linea " + line + ":" + startCol + "-" + endCol + ". " +errorMessage;
-    }
+  function añadirError(errorMessage, location) {
+      if (errorSalida !== "") {
+          errorSalida += "\n";
+      }
+      let startCol = location.start.column
+      let endCol = location.end.column
+      let line = location.start.line
+      errorSalida += "Error en linea " + line + ":" + startCol + "-" + endCol + ". " +errorMessage;
+  }
+
+  function tipoDeValor(valor) {
+    if (typeof valor === "number" && Number.isInteger(valor)) return "int";
+    if (typeof valor === "number") return "float";
+    if (typeof valor === "string" && valor.length === 1) return "char";
+    if (typeof valor === "string") return "string";
+    if (typeof valor === "boolean") return "bool";
+    return "desconocido";
+  }
+
 }}
 
 {
@@ -87,32 +97,51 @@ sentencia
   / sentencia:funciones _             { return sentencia; }
   / sentencia:structs _               { return sentencia; }
 
+//Declaración de variables
 declaracionVariables "declaración de variables"
   = tipo:tipoVariable _ variable:variable _ "=" _ valor:expresion _ ";" 
   {
-    setVariable(variable, valor, tipo.tipo, location().start.line, location().start.column);
-    return { tipo: "declaracion", tipoVar: tipo.tipo, nombre: variable, valor, ubicacion: location() };
+  const tipoValor = tipoDeValor(valor);
+  if (tipo.tipo !== tipoValor) {
+    añadirError("Tipo de valor incorrecto para la variable '" + variable + "'. Se esperaba '" + tipo.tipo + "' y se recibió '" + tipoValor + "'", location());
   }
 
+  setVariable(variable, valor, tipo.tipo, location().start.line, location().start.column);
+  return { tipo: "declaracion", tipoVar: tipo.tipo, nombre: variable, valor, ubicacion: location() };
+}
+
+//Modificación de valor a las variables
 asignacionVariable "asignación"
   = variable:variable _ "=" _ valor:expresion _ ";"
     {
-      let tipo = getVariable(variable)?.type;
-      if (tipo === null) {
-        añadirError("Variable " + variable + " no está definida", location());
+      const registro = memoria.get(variable);
+      if (!registro) {
+        añadirError("Variable '" + variable + "' no está definida", location());
+      } else {
+        const tipoValor = tipoDeValor(valor);
+        if (registro.type !== tipoValor) {
+          añadirError("Tipo de valor incorrecto al asignar a la variable '" + variable + "'. Se esperaba '" + registro.type + "' y se recibió '" + tipoValor + "'", location());
+        }
+        setVariable(variable, valor, registro.type, location().start.line, location().start.column);
       }
 
-      setVariable(variable, valor, tipo, location().start.line, location().start.column);
       return { tipo: "asignación", nombre: variable, valor, ubicacion: location() };
     }
+
   / nombre:variable _ "=" _ valor:funcion
     {
-      let tipo = getVariable(nombre)?.type;
-      if (tipo === null) {
-        añadirError("Variable " + nombre + " no está definida", location());
+      const registro = memoria.get(nombre);
+      if (!registro) {
+        añadirError("Variable '" + nombre + "' no está definida", location());
+      } else {
+        const tipoValor = tipoDeValor(valor);
+        if (registro.type !== tipoValor) {
+          añadirError("Tipo de valor incorrecto al asignar a la variable '" + nombre + "'. Se esperaba '" + registro.type + "' y se recibió '" + tipoValor + "'", location());
+        }
+        setVariable(nombre, valor, registro.type, location().start.line, location().start.column);
       }
-      setVariable(nombre, valor, tipo, location().start.line, location().start.column);
-      return { tipo: "asignacion", nombre, valor, ubicacion: location() };
+
+      return { tipo: "asignación", nombre, valor, ubicacion: location() };
     }
 
 funcion "función"
@@ -147,10 +176,11 @@ sumaResta
   / mul:multiplicacionDivision { return mul; }
 
 multiplicacionDivision
-  = izq:potencia _ op:("*" / "/") _ der:multiplicacionDivision {
+  = izq:potencia _ op:("*" / "/") _ der:multiplicacionDivision 
+    {
       return (op == "*" ? izq * der : izq / der);
     }
-  /base:potencia lista:multiplicacionImplicita* {
+  / base:potencia lista:multiplicacionImplicita* {
       let resultado = base;
       for (let i = 0; i < lista.length; i++) {
         resultado *= lista[i];
@@ -374,8 +404,7 @@ caracter "char"
   }
 
 boolean "booleano"
-  = "true" { return true; }
-  / "false" { return false; }
+  = bool:("true" / "false") { return bool; }
 
 variable "variable"
   = v:[a-zA-Z_][a-zA-Z0-9_]* { return v; }
