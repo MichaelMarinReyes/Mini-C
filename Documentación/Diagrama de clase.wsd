@@ -1,0 +1,102 @@
+@startuml Mini-C
+package app {
+    package backend {
+        interface ArchivoCMM {
+            +modulo: string;
+            +nombre: string;
+            +contenido: string;
+        }
+
+        class EditorService {
+            -archivos: ArchivoCMM[]
+            +crearArchivo(archivo: ArchivoCMM[]): void
+            +obtenerArchivos(): ArchivoCMM[]
+        }
+
+        class LecturaArchivo {
+            +procesarYML(): ArchivosGenerados[]
+        }
+
+        interface ArchivosGenerados {
+            +nombre: string
+            +contenidos: string
+        }
+
+        class ParserService {
+            -errores: List
+            +getErrores(): List
+            +setErrores(errores: list): void
+            +limpiar(): void
+        }
+    }
+
+    package frontend {
+        class PaginaPrincipal {
+            +PaginaPrincipal(router: Router)
+            +abrirArchivo(): void
+            +leerArchivoYML(): void
+        }
+
+        class EditorTextoComponent {
+            -texto: string
+            -lineas: int[]
+            -lineaCursor: int
+            -columnaCursor: int
+            -salidaConsola: string
+            -errorParser: string
+            -tablaSymbolos: Map<string, {}}>
+            -estructuraArchivos: ArchivoNodo[]
+            +EditorTextoComponent()
+            +ngOnInit(): void
+            +ngAfterViewInit(): void
+            +onInput(): void
+            +actualizarLineas(): void
+            +actualizarPosicionCursor(): void
+            +sincronizarScroll(): void
+            +obtenerTexto(): void
+            +abrirCarpeta(): void
+            -recorrerDirectorio(): void
+            +abrirArchivo(): void
+            -manejarTabulador(): void
+        }
+
+        class Reportes {
+            -errores: List
+            +Reportes(errorService: ErrorService)
+            +gOnInit(): void
+        }
+    }
+
+    class AppComponent {
+        -menuArchivoVisible: boolean
+        +AppComponent(router: Router)
+        -toggleMenuArchivo(): void
+        -clickFuera(): void
+        -nuevoArchivo(): void
+        -abrirArchivo(): void
+        -leerArchivoYML(): void
+    }
+}
+
+package utils {
+    class Parser {
+        +generateParser()
+        +parse(input: string)
+    }
+}
+
+class InicioComponent {
+    +cargarInicio()
+}
+
+AppComponent *-- EditorTextoComponent
+AppComponent *-- InicioComponent
+AppComponent *-- Reportes
+AppComponent *-- PaginaPrincipal
+
+EditorTextoComponent --> EditorService
+Reportes --> LecturaArchivo
+EditorService --> ArchivoCMM
+LecturaArchivo --> ParserService
+ParserService *-- Parser
+@enduml
