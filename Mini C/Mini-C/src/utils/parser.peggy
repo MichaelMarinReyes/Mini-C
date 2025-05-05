@@ -79,8 +79,26 @@ lenguajes "lenguajes"
 
 //Parser para YAML
 estructuraYAML "yml"
-  = np:nombreProyecto _ main:main _ mods:modulos* _ 
-  { return {nombre: np, main: main, modulos: mods}; }
+  = np:nombreProyecto _ main:main _ mods:modulos* _
+  {
+    const resultado = {
+      nombre_proyecto: np,
+      main: main
+    };
+
+    mods.forEach((modulo, index) => {
+      const nombreModulo = `modulo${index + 1}`;
+      const archivos = {};
+      modulo.forEach((archivo, i) => {
+        const nombre = archivo.replace('.cmm', '');
+        archivos[`archivo${i + 1}`] = archivo;
+      });
+      resultado[nombreModulo] = archivos;
+    });
+
+    return resultado;
+  }
+
 
 nombreProyecto "nombre proyecto"
   = comentario* "nombre_proyecto" _ ":" _ "\"" nombre:variable "\"" comentario*

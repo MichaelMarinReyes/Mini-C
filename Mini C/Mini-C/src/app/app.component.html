@@ -7,7 +7,7 @@
       <button class="boton-menu" routerLink="/archivo" routerLinkActive="activo">Archivo</button>
       <div class="submenu" *ngIf="menuArchivoVisible">
         <a class="submenu-item" routerLink="/nuevo">Nuevo</a>
-        <a class="submenu-item" routerLink="/abrir">Abrir</a>
+        <a class="submenu-item" (click)="abrirArchivo()">Abrir</a>
         <a class="submenu-item" routerLink="/guardar">Guardar</a>
       </div>
     </div>

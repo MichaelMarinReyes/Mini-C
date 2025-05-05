@@ -390,7 +390,24 @@ function peg$parse(input, options) {
   var peg$f0 = function() { return {salida: salida, errores: errorSalida, tablaSimbolos: memoria}; };
   var peg$f1 = function(yaml) { return yaml; };
   var peg$f2 = function(miniC) { return miniC; };
-  var peg$f3 = function(np, main, mods) { return {nombre: np, main: main, modulos: mods}; };
+  var peg$f3 = function(np, main, mods) {
+    const resultado = {
+      nombre_proyecto: np,
+      main: main
+    };
+
+    mods.forEach((modulo, index) => {
+      const nombreModulo = `modulo${index + 1}`;
+      const archivos = {};
+      modulo.forEach((archivo, i) => {
+        const nombre = archivo.replace('.cmm', '');
+        archivos[`archivo${i + 1}`] = archivo;
+      });
+      resultado[nombreModulo] = archivos;
+    });
+
+    return resultado;
+  };
   var peg$f4 = function(nombre) { return nombre; };
   var peg$f5 = function(archivo) { return archivo + ".cmm"; };
   var peg$f6 = function(archivos) { return archivos.flat(); };
