@@ -51,15 +51,23 @@
       console.log("ERROR-> " + errorSalida)
   }
 
+  function convertirBoleano(valor) {
+    if (valor === "true") return true;
+    if (valor === "false") return false;
+    return valor;
+  }
+
   function tipoDeValor(valor) {
+    valor = convertirBoleano(valor);
+
     if (typeof valor === "number" && Number.isInteger(valor)) return "int";
     if (typeof valor === "number") return "float";
-    if (typeof valor === "string") {
-    if (/^'.'$/.test(valor)) return "char";
-      return "char";
-    }
-    if (typeof valor === "string") return "string";
     if (typeof valor === "boolean") return "bool";
+    if (typeof valor === "string") {
+      if (/^'.{1}'$/.test(valor)) return "char";    
+      if (/^".*"$/.test(valor)) return "string";
+    }
+
     return "desconocido";
   }
 }}
@@ -343,15 +351,9 @@ condicional "condicional if"
     if (typeof resultadoCond !== "boolean") {
       añadirError("La condición del if no es booleana", location());
     } else if (resultadoCond === true) {
-      bloque.forEach(instr => {
-        // podrías ejecutar la instrucción aquí si tienes un motor
-        // o solo guardar lo ejecutado
-      });
+      //condicion del bloque if
     } else if (elsePart && elsePart.ejecutar === true) {
-      // Ejecutar el bloque del else si lo hay
-      elsePart.bloque.forEach(instr => {
-        // Ejecutar instrucciones del else
-      });
+      // Ejecutar el bloque del else-if
     }
 
     return {
@@ -431,22 +433,16 @@ numero "número"
   }
 
 cadena "string"
-  = '"' txt:[^"\n\r"]* '"' 
-  {
-    return txt.join("");
-  }
+  = '"' [^"\n\r"]* '"' { return text(); }
 
 caracter "char"
-  = "'" c:[a-zA-Z0-9] "'" 
-  {
-    return c;
-  }
+  = "'" [a-zA-Z0-9] "'" { return text(); }
 
 boolean "booleano"
-  = bool:("true" / "false") { return bool; }
+  = ("true" / "false") { return text(); }
 
 variable "variable"
-  = v:[a-zA-Z_][a-zA-Z0-9_]* { return v; }
+  = [a-zA-Z_][a-zA-Z0-9_]* { return text(); }
 
 _ "whitespace"
   = [ \t\n\r]*

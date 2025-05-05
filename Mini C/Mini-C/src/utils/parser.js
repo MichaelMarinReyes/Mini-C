@@ -56,17 +56,28 @@
       console.log("ERROR-> " + errorSalida)
   }
 
-  function tipoDeValor(valor) {
-    if (typeof valor === "number" && Number.isInteger(valor)) return "int";
-    if (typeof valor === "number") return "float";
-    if (typeof valor === "string") {
-    if (/^'.'$/.test(valor)) return "char";
-      return "char";
-    }
-    if (typeof valor === "string") return "string";
-    if (typeof valor === "boolean") return "bool";
-    return "desconocido";
+function convertirBoleano(valor) {
+  if (valor === "true") return true;
+  if (valor === "false") return false;
+  return valor;
+}
+
+function tipoDeValor(valor) {
+  console.log("valor recibido", valor);
+  console.log("tipo de valor recibido: ", typeof valor)
+  valor = convertirBoleano(valor);
+
+  if (typeof valor === "number" && Number.isInteger(valor)) return "int";
+  if (typeof valor === "number") return "float";
+  if (typeof valor === "boolean") return "bool";
+  if (typeof valor === "string") {
+    if (/^'.{1}'$/.test(valor)) return "char";    
+    if (/^".*"$/.test(valor)) return "string";
   }
+
+  return "desconocido";
+}
+
 
 function peg$subclass(child, parent) {
   function C() { this.constructor = child; }
@@ -559,15 +570,9 @@ function peg$parse(input, options) {
     if (typeof resultadoCond !== "boolean") {
       añadirError("La condición del if no es booleana", location());
     } else if (resultadoCond === true) {
-      bloque.forEach(instr => {
-        // podrías ejecutar la instrucción aquí si tienes un motor
-        // o solo guardar lo ejecutado
-      });
+      //condicion del bloque if
     } else if (elsePart && elsePart.ejecutar === true) {
-      // Ejecutar el bloque del else si lo hay
-      elsePart.bloque.forEach(instr => {
-        // Ejecutar instrucciones del else
-      });
+      // Ejecutar el bloque del else-if
     }
 
     return {
@@ -628,14 +633,10 @@ function peg$parse(input, options) {
       const numeroComoTexto = entero.join("") + (decimal ? decimal[0] + decimal[1].join("") : "");
       return parseFloat(numeroComoTexto);
   };
-  var peg$f68 = function(txt) {
-    return txt.join("");
-  };
-  var peg$f69 = function(c) {
-    return c;
-  };
-  var peg$f70 = function(bool) { return bool; };
-  var peg$f71 = function(v) { return v; };
+  var peg$f68 = function() { return text(); };
+  var peg$f69 = function() { return text(); };
+  var peg$f70 = function() { return text(); };
+  var peg$f71 = function() { return text(); };
   var peg$currPos = options.peg$currPos | 0;
   var peg$savedPos = peg$currPos;
   var peg$posDetailsCache = [{ line: 1, column: 1 }];
@@ -3912,7 +3913,7 @@ function peg$parse(input, options) {
       }
       if (s3 !== peg$FAILED) {
         peg$savedPos = s0;
-        s0 = peg$f68(s2);
+        s0 = peg$f68();
       } else {
         peg$currPos = s0;
         s0 = peg$FAILED;
@@ -3960,7 +3961,7 @@ function peg$parse(input, options) {
         }
         if (s3 !== peg$FAILED) {
           peg$savedPos = s0;
-          s0 = peg$f69(s2);
+          s0 = peg$f69();
         } else {
           peg$currPos = s0;
           s0 = peg$FAILED;
@@ -4005,7 +4006,7 @@ function peg$parse(input, options) {
     }
     if (s1 !== peg$FAILED) {
       peg$savedPos = s0;
-      s1 = peg$f70(s1);
+      s1 = peg$f70();
     }
     s0 = s1;
     peg$silentFails--;
@@ -4049,7 +4050,7 @@ function peg$parse(input, options) {
         }
       }
       peg$savedPos = s0;
-      s0 = peg$f71(s1);
+      s0 = peg$f71();
     } else {
       peg$currPos = s0;
       s0 = peg$FAILED;

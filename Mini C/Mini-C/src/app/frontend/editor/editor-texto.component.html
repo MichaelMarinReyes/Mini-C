@@ -44,3 +44,25 @@
         {{ salidaConsola }}
     </div>
 </div>
+
+<div>
+    <h2>Tabla de Símbolos</h2>
+    <table style="min-width: 15vw;" class="styled-table">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Valor</th>
+          <th>Tipo</th>
+          <th>Ubicación</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let entry of tablaSymbolos | keyvalue">
+          <td>{{ entry.key }}</td>
+          <td>{{ entry.value.value }}</td>
+          <td>{{ entry.value.type }}</td>
+          <td>Línea: {{ entry.value.location.line }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>  
