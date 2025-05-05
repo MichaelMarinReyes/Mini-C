@@ -10,8 +10,24 @@
   let errores = [];
  
   function setVariable(id, valor, tipo, linea, columna) {
-      memoria.set(id, {value: valor, type: tipo, location: {line: linea, col: columna}})
+    const tipoValor = tipoDeValor(valor);
+
+    if (tipo === "string" && tipoValor === "string") {
+      memoria.set(id, {value: valor, type: tipo, location: {line: linea, col: columna}});
+    } else if (tipo === "int" && tipoValor === "int") {
+      memoria.set(id, {value: valor, type: tipo, location: {line: linea, col: columna}});
+    } else if (tipo === "float" && tipoValor === "float") {
+      memoria.set(id, {value: valor, type: tipo, location: {line: linea, col: columna}});
+    } else if (tipo === "char" && tipoValor === "char") {
+      memoria.set(id, {value: valor, type: tipo, location: {line: linea, col: columna}});
+    } else if (tipo === "bool" && tipoValor === "bool") {
+      memoria.set(id, {value: valor, type: tipo, location: {line: linea, col: columna}});
+    } else {
+      let mensaje = "No se puede asignar el valor \"" + valor + "\" (tipo " + tipoValor + ") a una variable de tipo " + tipo;
+      añadirError(mensaje, columna);
+    }
   }
+
   
   function getVariable(id) {
       let registro = memoria.get(id)
@@ -37,17 +53,20 @@
       let endCol = location.end.column
       let line = location.start.line
       errorSalida += "Error en linea " + line + ":" + startCol + "-" + endCol + ". " +errorMessage;
+      console.log("ERROR-> " + errorSalida)
   }
 
   function tipoDeValor(valor) {
     if (typeof valor === "number" && Number.isInteger(valor)) return "int";
     if (typeof valor === "number") return "float";
-    if (typeof valor === "string" && valor.length === 1) return "char";
+    if (typeof valor === "string") {
+    if (/^'.'$/.test(valor)) return "char";
+      return "char";
+    }
     if (typeof valor === "string") return "string";
     if (typeof valor === "boolean") return "bool";
     return "desconocido";
   }
-
 
 function peg$subclass(child, parent) {
   function C() { this.constructor = child; }
@@ -477,6 +496,8 @@ function peg$parse(input, options) {
       const variableExiste = getVariable(variable);
       if (variableExiste !== null) {
         salidaTexto(variableExiste);
+      } else {
+        añadirError("La variable " + variable + "no esta declarada", location())
       }
     };
   var peg$f46 = function(contenido) {

@@ -19,8 +19,8 @@ export class EditorTextoComponent implements AfterViewInit, OnInit {
   lineas: number[] = [1];
   lineaCursor = 1;
   columnaCursor = 1;
-  salidaConsola: string = 'Prueba de consola';
-  error: string = "";
+  salidaConsola: string = '';
+  errorParser: string = "";
   tablaSymbolos: Map<string, { value: any, type: String, location: any}> = new Map();
   estructuraArchivos: ArchivoNodo[] = [];
 
@@ -69,8 +69,8 @@ export class EditorTextoComponent implements AfterViewInit, OnInit {
     try {
       const resultado = parser.parse(this.texto);
   
-      this.salidaConsola = "parseo sin errores";
-      this.error = resultado.error;
+      this.salidaConsola = "";
+      this.errorParser = resultado.error;
       this.tablaSymbolos = resultado.tablaSimbolos;
 
       console.log(this.tablaSymbolos);
@@ -82,9 +82,10 @@ export class EditorTextoComponent implements AfterViewInit, OnInit {
   
       this.salidaConsola = resultado.salida;
   
-    } catch (error: any) {
-      this.salidaConsola = 'Error: ' + error.message;
-  
+    } catch (errors: any) {
+      console.log(this.errorParser)
+      this.salidaConsola = 'Error: ' + this.errorParser;
+  /*
       this.errorService.setErrores([
         {
           tipo: 'Excepción',
@@ -93,7 +94,7 @@ export class EditorTextoComponent implements AfterViewInit, OnInit {
           columna: error.column || 0,
           lexema: error.lexema || '',
         }
-      ]);
+      ]);*/
     }
   }  
 
